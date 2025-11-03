@@ -1,5 +1,15 @@
 <?php
+require_once __DIR__.'/models/Peli.php';
+require_once __DIR__.'/models/PeliDAO.php';
 include_once __DIR__ . '/header.php';
+include_once __DIR__.'/utils.php';
+$peli = null;
+if ($_SERVER['REQUEST_METHOD'] == "GET") {
+  if(isset($_GET["id"]) && !empty($_GET["id"])){
+    $id = neteja_dades($_GET["id"]);
+    $peli = PeliDAO::select($id);
+  }
+}
 ?>
 <main>
   <!-- imatge de capçalera-->
