@@ -12,10 +12,13 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
 }
 ?>
 <main>
+  <?php
+    if(!empty($peli)):
+  ?>
   <!-- imatge de capçalera-->
   <div class="bg"
     style="background-image: 
-url('assets/joker.jpg'); 
+    url('uploads/<?= $peli->getImatge()?>'); 
       background-size: cover; 
       background-position: center; 
       height: 30vh;">
@@ -24,8 +27,8 @@ url('assets/joker.jpg');
       <div class="row py-lg-5">
         <!-- títol de la pàgina -->
         <div class="col-lg-6 col-md-8 mx-auto text-white">
-          <h1 class="fw-light">The Joker</h1>
-          <p class="lead">Todd Philips - 2019</p>
+          <h1 class="fw-light"><?= $peli->getTitol()?></h1>
+          <p class="lead"><?= $peli->getDirector()?> - <?= $peli->getAny()?></p>
         </div>
       </div>
 
@@ -37,14 +40,14 @@ url('assets/joker.jpg');
         <div class="col-md-12">
           <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
             <div class="col-md-4 d-none d-lg-block">
-              <img src="uploads/joker.jpg" class="object-fit-cover" alt="portada_peli" height="450" width="100%">
+              <img src="uploads/<?= $peli->getImatge()?>" class="object-fit-cover" alt="portada_peli" height="450" width="100%">
 
             </div>
             <!-- Dades de la pel·li-->
             <div class="col p-4 d-flex flex-column position-static">
-              <strong class="d-inline-block mb-2 text-primary">Todd Philips - 2019 - Estats Units - 121 minuts</strong>
+              <strong class="d-inline-block mb-2 text-primary"><?= $peli->getDirector()?> - <?= $peli->getAny()?> - <?= $peli->getPais()?> - <?= $peli->getDuracio()?></strong>
               <h1 class="d-inline-flex justify-content-between align-items-center">
-                Joker
+                <?= $peli->getTitol()?>
                 <!-- Puntuació-->
                 <span class="ms-3">
                   <i class="bi bi-star-fill fs-5"></i>
@@ -55,7 +58,7 @@ url('assets/joker.jpg');
                 </span>
               </h1>
               <!-- Argument-->
-              <p class="card-text mb-auto">Arthur Fleck (Phoenix) vive en Gotham con su madre, y su única motivación en la vida es hacer reír a la gente. Actúa haciendo de payaso en pequeños trabajos, pero tiene problemas mentales que hacen que la gente le vea como un bicho raro. Su gran sueño es actuar como cómico delante del público, pero una serie de trágicos acontecimientos le hará ir incrementando su ira contra una sociedad que le ignora..</p>
+              <p class="card-text mb-auto"><?= $peli -> getSinopsi()?></p>
 
               <!-- Gèneres-->
               <p class="mb-2 text-end">
@@ -69,6 +72,9 @@ url('assets/joker.jpg');
       </div>
     </div>
   </div>
+      <?php
+      endif;
+      ?>
 </main>
 <?php
 include_once __DIR__ . '/footer.php';
