@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__.'/models/Peli.php';
-require_once __DIR__.'/models/PeliDAO.php';
-include_once __DIR__ . '/header.php';
-include_once __DIR__.'/utils.php';
+require_once __DIR__.'/models/PeliDAO.php';session_start();
+
+
+include_once __DIR__.'/models/utils.php';
+
 $peli = null;
 if ($_SERVER['REQUEST_METHOD'] == "GET") {
   if(isset($_GET["id"]) && !empty($_GET["id"])){
@@ -10,9 +12,17 @@ if ($_SERVER['REQUEST_METHOD'] == "GET") {
     $peli = PeliDAO::select($id);
   }
 }
+
+    if(empty($peli)){
+      $_SESSION["misssatge_error"]="No sha trobat pelicula";
+      header('Location: index.php');
+      exit;
+    }
+include_once __DIR__ . '/header.php';
 ?>
 <main>
-  <?php
+  
+<?php    
     if(!empty($peli)):
   ?>
   <!-- imatge de capçalera-->

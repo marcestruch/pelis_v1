@@ -2,6 +2,7 @@
 require_once __DIR__.'/models/Peli.php';
 require_once __DIR__.'/models/PeliDAO.php';
 $llistaPelis = PeliDAO::getAll();
+session_start();
 include_once __DIR__ . '/header.php';
 ?>
 <main>
@@ -33,7 +34,15 @@ url('assets/film.jpg');
   </div>
   <div class="album py-5 bg-light">
     <div class="container">
-
+    <?php
+    if(!empty($_SESSION["misssatge_error"])):
+    ?>
+  <div class="alert alert-danger" role="alert">
+      <?= $_SESSION["misssatge_error"]?>
+  </div>
+  <?php
+    endif;
+  ?>
     <?php if(empty($llistaPelis)): ?>
       <h2>No hi ha pelicules</h2>
       <?php endif?>
