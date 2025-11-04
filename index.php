@@ -3,6 +3,14 @@ require_once __DIR__.'/models/Peli.php';
 require_once __DIR__.'/models/PeliDAO.php';
 $llistaPelis = PeliDAO::getAll();
 session_start();
+
+//Comprovar
+if(!empty($_SESSION["misssatge_error"])){
+  $missatge_error=$_SESSION["misssatge_error"];
+  $_SESSION["misssatge_error"]="";
+}else{
+  header('Location: index.php');
+}
 include_once __DIR__ . '/header.php';
 ?>
 <main>
@@ -35,10 +43,10 @@ url('assets/film.jpg');
   <div class="album py-5 bg-light">
     <div class="container">
     <?php
-    if(!empty($_SESSION["misssatge_error"])):
+    if(!empty($missatge_error)):
     ?>
   <div class="alert alert-danger" role="alert">
-      <?= $_SESSION["misssatge_error"]?>
+      <?= $missatge_error?>
   </div>
   <?php
     endif;
