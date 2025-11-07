@@ -1,5 +1,39 @@
 <?php
+include_once __DIR__.'/models/PeliDAO.php';
+include_once __DIR__.'/models/Peli.php';
 include_once __DIR__ . '/header.php';
+include_once __DIR__.'/models/utils.php';
+
+//Inicializar variables
+
+$id ="";
+$imatge_cap = "assets/film.jpg";
+$titol_pagina="";
+$titol="";
+$director="";
+$imatge_portada= "assets/proximamente.png";
+$valoracio=1;
+$generes="";
+$llista_generes_peli=[];
+$pais="";
+$duracio =100;
+$anyo = date("Y");
+$sinopsi= "";
+
+$is_actualitzat = false;
+$is_insertat = false;
+
+//inicializar selects
+
+$llista_paisos_select = [
+  'Espanya',
+  'Estats Units',
+  'Itália',
+  'Japó',
+  'Regne Unit'
+];
+
+
 ?>
 
 <main>

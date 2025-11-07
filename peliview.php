@@ -60,11 +60,17 @@ include_once __DIR__ . '/header.php';
                 <?= $peli->getTitol()?>
                 <!-- Puntuació-->
                 <span class="ms-3">
-                  <i class="bi bi-star-fill fs-5"></i>
-                  <i class="bi bi-star-fill fs-5"></i>
-                  <i class="bi bi-star-fill fs-5"></i>
-                  <i class="bi bi-star-fill fs-5"></i>
-                  <i class="bi bi-star fs-5"></i>
+                  <?php
+                  $i=1;
+                  while($i <= $peli->getValoracio()){
+                    echo "<i class=\"bi bi-star-fill fs-5\"></i>\n";
+                    $i++;
+                  }
+                  while($i <= 5){
+                    echo "<i class=\"bi bi-star fs-5\"></i>\n";
+                    $i++;
+                  }
+                  ?>
                 </span>
               </h1>
               <!-- Argument-->
@@ -72,9 +78,12 @@ include_once __DIR__ . '/header.php';
 
               <!-- Gèneres-->
               <p class="mb-2 text-end">
-                <a href="#" class="btn btn-primary">Thriller</a>
-                <a href="#" class="btn btn-primary">Drama</a>
-                <a href="#" class="btn btn-primary">Crimen</a>
+                <?php
+                $llista_generes = explode(",", $peli->getGenere());
+                foreach($llista_generes as $genere){
+                  echo "<a href=\"#\" class=\"btn btn-primary\">$genere</a>\n";
+                }
+                ?>
               </p>
             </div>
           </div>
