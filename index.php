@@ -70,7 +70,7 @@ foreach($llistaPelis as $peli):
                 <small class="text-muted"><?= $peli->getAny()?></small>
                 <div class="btn-group">
                   <a href="peliview.php?id=<?= $peli->getId()?>" class="btn btn-dark"><i class="fa fa-eye"></i></a>
-                  <a href="peliedit.php" class="btn btn-danger"><i class="fa fa-pencil-square"></i></a>
+                  <a href="peliedit.php?id=<?= $peli->getId()?>" class="btn btn-danger"><i class="fa fa-pencil-square"></i></a>
                 </div>
 
 

@@ -1,8 +1,9 @@
 <?php
 include_once __DIR__.'/models/PeliDAO.php';
 include_once __DIR__.'/models/Peli.php';
-
 include_once __DIR__.'/models/utils.php';
+session_start();
+
 
 //Inicializar variables
 
@@ -231,10 +232,9 @@ url('assets/film.jpg');
                 <label for="exampleDataList" class="form-label">País</label>
                 <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Escriu per buscar el nom del país..." required>
                 <datalist id="datalistOptions">
-                  <option value="España">
-                  <option value="Estats Units">
-                  <option value="Japó">
-                  <option value="Regne Unit">
+                  <?php foreach ($llistaPaisosSelect as $pais): ?>
+                    <option value="<?= $pais ?>">
+                  <?php endforeach; ?>
                 </datalist>
                 <div class="invalid-feedback">
                   El país és invàlid
@@ -252,12 +252,9 @@ url('assets/film.jpg');
               <div class="col-6">
                 <label for="genere" class="form-label">Gènere</label>
                 <select class="form-select" name="genere" id="genere" multiple aria-label="multiple select example">
-                  <option selected>Selecciona un o més géneres</option>
-                  <option value="acció">Acció</option>
-                  <option value="terror">Terror</option>
-                  <option value="comedia">Comedia</option>
-                  <option value="drama">Drama</option>
-                  <option value="fantasia">Fantasia</option>
+                  <?php foreach ($llistaGeneresSelect as $genereSelect): ?>
+                    <option value="<?= $genereSelect ?>"><?= $genereSelect ?></option>
+                  <?php endforeach; ?>
                 </select>
                 <div class="invalid-feedback">
                   Selecciona un génere
