@@ -84,6 +84,47 @@ class PeliDAO
         }
         return 0;
     }
+    public static function insert($peli)
+    {
+        $conn = DBConnection::connectDB();
+        if (!is_null($conn)) {
+            $stmt = $conn->prepare("INSERT INTO pelis(id,  
+                                           titol,
+                                           valoracio,
+                                           pais,
+                                           director,
+                                           genere,
+                                           duracio,
+                                           anyo,
+                                           sinopsi,
+                                           imatge)   
+                                     VALUES(:id,  
+                                           :titol,
+                                           :valoracio,
+                                           :pais,
+                                           :director,
+                                           :genere,
+                                           :duracio,
+                                           :anyo,
+                                           :sinopsi,
+                                           :imatge)");
+            $stmt->execute([
+                'id' => null,
+                'titol' => $peli->getTitol(),
+                'valoracio' => $peli->getValoracio(),
+                'pais' => $peli->getPais(),
+                'director' => $peli->getDirector(),
+                'genere' => $peli->getGenere(),
+                'duracio' => $peli->getDuracio(),
+                'anyo' => $peli->getAnyo(),
+                'sinopsi' => $peli->getSinopsi(),
+                'imatge' => $peli->getImatge()
+            ]);
+            return $conn->lastInsertId();
+        }
+        return 0;
+    }
 }
+
 
 ?>

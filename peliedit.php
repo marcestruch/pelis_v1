@@ -1,7 +1,7 @@
 <?php
 include_once __DIR__.'/models/PeliDAO.php';
 include_once __DIR__.'/models/Peli.php';
-include_once __DIR__ . '/header.php';
+
 include_once __DIR__.'/models/utils.php';
 
 //Inicializar variables
@@ -33,6 +33,108 @@ $llista_paisos_select = [
   'Regne Unit'
 ];
 
+$errores = [];
+$missatge_ok = "";
+
+if($_SERVER["REQUEST_METHOD"]=="POST"){
+
+  //titol
+  $titol = neteja_dades($_POST["titol"] ?? "");
+  if(empty($titol)){
+    $errores["titol"] = "Título es un campo obligatorio";
+  }
+
+  //valoracio
+  $valoracio = neteja_dades($_POST["valoracio"] ?? "");
+  if(empty($valoracio)){
+    $errores["valoracio"] = "Valoración es un campo obligatorio";
+  }
+
+  //director
+  $director = neteja_dades($_POST["director"] ?? "");
+  if(empty($director)){
+    $errores["director"] = "Director es un campo obligatorio";
+  }
+
+  //pais
+  $pais = neteja_dades($_POST["pais"] ?? "");
+  if(empty($pais)){
+    $errores["pais"] = "País es un campo obligatorio";
+  }
+
+  //genere
+  $genere = implode(",", $_POST["genere"]);
+  $genere = neteja_dades($genere ?? "");
+  
+  if(empty($genere)){
+    $errores["genere"] = "Género es un campo obligatorio";
+  }
+
+  //duracio
+  $duracio = neteja_dades($_POST["duracio"] ?? "");
+  if(empty($duracio)){
+    $errores["duracio"] = "Duración es un campo obligatorio";
+  }
+
+  //any
+  $any = neteja_dades($_POST["any"] ?? "");
+  if(empty($any)){
+    $errores["any"] = "Año es un campo obligatorio";
+  }
+
+  //sinopsi
+  $sinopsi = neteja_dades($_POST["sinopsi"] ?? "");
+  if(empty($sinopsi)){
+    $errores["sinopsi"] = "Sinopsi es un campo obligatorio";
+  }
+
+  //imatge
+  if(!empty($_FILES["file_portada"]) && $_FILES["file_portada"]["error"]== 0){
+    $imatge = pujar_imatge("file_portada", $titol);
+  }
+
+  //id
+  $id = neteja_dades($_POST["id"] ?? "");
+
+
+  //No hay errores
+  if(empty($errores)){
+    
+    if(empty($id)){
+      $peli = new Peli();
+    } else {
+      $peli = PeliDAO::select($id);
+    }
+
+    $peli->setTitol($titol);
+    $peli->setValoracio($valoracio);
+    $peli->setPais($pais);
+    $peli->setDirector($director);
+    $peli->setGenere($genere);
+    $peli->setDuracio($duracio);
+    $peli->setAny($anyo);
+    $peli->setSinopsi($sinopsi);
+    
+    if(!empty($imatge)){
+      $peli->setImatge($imatge);
+    }
+
+    //Insertamos la peli
+    if(empty($id)){
+      $id = PeliDAO::insert($peli);
+      $peli->setId($id);
+      $missatge_ok = "Película insertada correctamente";
+    } else {
+      PeliDAO::update($peli);
+      $missatge_ok = "Película actualizada correctamente";
+    }
+    
+  }
+
+}
+
+
+include_once __DIR__ . '/header.php';
 
 ?>
 
