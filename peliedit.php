@@ -77,8 +77,8 @@ if($_SERVER["REQUEST_METHOD"]=="POST"){
   }
 
   //any
-  $any = neteja_dades($_POST["any"] ?? "");
-  if(empty($any)){
+  $anyo = neteja_dades($_POST["any"] ?? "");
+  if(empty($anyo)){
     $errores["any"] = "Año es un campo obligatorio";
   }
 
