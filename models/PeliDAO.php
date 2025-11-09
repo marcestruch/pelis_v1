@@ -54,6 +54,36 @@ class PeliDAO
         }
         return null;
     }
+
+    public static function update($object): int
+    {
+        $conn = DBConnection::connectDB();
+        if (!is_null($conn)) {
+            $stmt = $conn->prepare("UPDATE pelis
+                                    SET titol=:titol,
+                                    valoracio=:valoracio,
+                                    pais=:pais,
+                                    director=:director,
+                                    genere=:genere,
+                                    duracio=:duracio,
+                                    anyo=:anyo
+                                    sinopsi=:sinopsi,
+                                    imatge=:imatge
+                                    WHERE id=:id");
+            $stmt->execute(['id' =>$object->getId(),
+                            'titol' => $object -> getTitol(),
+                            'valoracio' => $object -> getValoracio(),
+                            'pais' => $object -> getPais(),
+                            'director' => $object -> getDirector(),
+                            'genere' => $object -> getGenere(),
+                            'duracio' => $object -> getDuracio(),
+                            'anyo' => $object -> getAny(),
+                            'sinopsi' => $object -> getSinopsi(),
+                            'imatge' => $object -> getImatge()]);
+            return $stmt->rowCount();
+        }
+        return 0;
+    }
 }
 
 ?>
