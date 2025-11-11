@@ -16,9 +16,9 @@ class UsuariDAO{
                                      WHERE email = :email");
             $stmt->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Peli');
             $stmt->execute(['email'=>$email]);
-            $peli = $stmt->fetch();
-            if($peli){
-                return $peli;
+            $usuari = $stmt->fetch();
+            if($usuari){
+                return $usuari;
             }
         }
         return null;
