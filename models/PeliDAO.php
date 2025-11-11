@@ -116,7 +116,7 @@ class PeliDAO
                 'director' => $peli->getDirector(),
                 'genere' => $peli->getGenere(),
                 'duracio' => $peli->getDuracio(),
-                'anyo' => $peli->getAnyo(),
+                'anyo' => $peli->getAny(),
                 'sinopsi' => $peli->getSinopsi(),
                 'imatge' => $peli->getImatge()
             ]);
@@ -124,6 +124,28 @@ class PeliDAO
         }
         return 0;
     }
+    public static function delete($id): bool
+    {
+    $conn = DBConnection::connectDB();
+    if (!is_null($conn)) {
+        // Comprobar si existe
+        $stmt = $conn->prepare("SELECT id FROM pelis WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        $peli = $stmt->fetch();
+
+        if (!$peli) {
+            // No existe la película
+            return false;
+        }
+
+        // Si existe, eliminarla
+        $stmt = $conn->prepare("DELETE FROM pelis WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return true;
+    }
+    return false;
+}
+
 }
 
 

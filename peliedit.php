@@ -199,7 +199,7 @@ include_once __DIR__ . '/header.php';
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                    <button type="button" class="btn btn-danger" onclick="window.location.href='delete_peli.php?id=<?= $id ?>'">Sí, eliminar</button>
+                    <button type="button" class="btn btn-danger" onclick="window.location.href='delete.php?id=<?= $id ?>'">Sí, eliminar</button>
                   </div>
                 </div>
               </div>
