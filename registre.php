@@ -8,12 +8,6 @@ include_once __DIR__ . '/header.php';
       <div class="card-body">
         <h5 class="card-title text-center mb-4">Crear un compte</h5>
         <form action="#" mehod="post">
-          <!-- Campo Nombre de Usuario -->
-          <div class="mb-3">
-            <label for="username" class="form-label">Nom d'usuari</label>
-            <input type="text" class="form-control" id="username" name="username" placeholder="" required>
-          </div>
-
           <!-- Correu electrònic -->
           <div class="mb-3">
             <label for="email" class="form-label">Correu electrònic</label>
