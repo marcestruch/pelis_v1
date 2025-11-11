@@ -51,7 +51,7 @@
         <div class="col-sm-4 offset-md-1 py-4">
           <h4 class="text-white">Admin</h4>
           <ul class="list-unstyled">
-            <li><a href="edit_peli.php" class="text-white">Afegir nova pel·lícula</a></li>
+            <li><a href="peliedit.php" class="text-white">Afegir nova pel·lícula</a></li>
             <li><a href="login.php" class="text-white">Accedir</a></li>
             <li><a href="registre.php" class="text-white">Registrar-se</a></li>
           </ul>

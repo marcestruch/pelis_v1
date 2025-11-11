@@ -66,7 +66,7 @@ class PeliDAO
                                     director=:director,
                                     genere=:genere,
                                     duracio=:duracio,
-                                    anyo=:anyo
+                                    anyo=:anyo,
                                     sinopsi=:sinopsi,
                                     imatge=:imatge
                                     WHERE id=:id");

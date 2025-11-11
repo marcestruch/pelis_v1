@@ -4,367 +4,284 @@ include_once __DIR__.'/models/Peli.php';
 include_once __DIR__.'/models/utils.php';
 session_start();
 
-
-//Inicializar variables
-
-$id ="";
+// Inicializar variables
+$id = "";
 $imatge_cap = "assets/film.jpg";
-$titol_pagina="";
-$titol="";
-$director="";
-$imatge_portada= "assets/proximamente.png";
-$valoracio=1;
-$generes="";
-$llista_generes_peli=[];
-$pais="";
-$duracio =100;
+$titol_pagina = "Nova pel·lícula";
+$titol = "";
+$director = "";
+$imatge_portada = "assets/proximamente.png";
+$valoracio = 1;
+$generes = "";
+$llista_generes_peli = [];
+$pais = "";
+$duracio = 100;
 $anyo = date("Y");
-$sinopsi= "";
+$sinopsi = "";
 
-$is_actualitzat = false;
 $is_insertat = false;
+$is_actualitzat = false;
 
-//inicializar selects
-
+// Inicializar listas select
 $llista_paisos_select = [
   'Espanya',
   'Estats Units',
-  'Itália',
+  'Itàlia',
   'Japó',
   'Regne Unit'
 ];
 
-$errores = [];
-$missatge_ok = "";
+$llista_generes_select = [
+  'Acció',
+  'Ciència-ficció',
+  'Comèdia',
+  'Drama',
+  'Fantasia',
+  'Història',
+  'Terror'
+];
 
-if($_SERVER["REQUEST_METHOD"]=="POST"){
+// --- CASO GET: Cargar datos si hay ID ---
+if ($_SERVER['REQUEST_METHOD'] == "GET") {
+  if (isset($_GET["id"]) && !empty($_GET["id"])) {
+    $id = neteja_dades($_GET["id"]);
 
-  //titol
-  $titol = neteja_dades($_POST["titol"] ?? "");
-  if(empty($titol)){
-    $errores["titol"] = "Título es un campo obligatorio";
-  }
+    // Comprobar si existe la película
+    $peli = PeliDAO::select($id);
 
-  //valoracio
-  $valoracio = neteja_dades($_POST["valoracio"] ?? "");
-  if(empty($valoracio)){
-    $errores["valoracio"] = "Valoración es un campo obligatorio";
-  }
-
-  //director
-  $director = neteja_dades($_POST["director"] ?? "");
-  if(empty($director)){
-    $errores["director"] = "Director es un campo obligatorio";
-  }
-
-  //pais
-  $pais = neteja_dades($_POST["pais"] ?? "");
-  if(empty($pais)){
-    $errores["pais"] = "País es un campo obligatorio";
-  }
-
-  //genere
-  $genere = implode(",", $_POST["genere"]);
-  $genere = neteja_dades($genere ?? "");
-  
-  if(empty($genere)){
-    $errores["genere"] = "Género es un campo obligatorio";
-  }
-
-  //duracio
-  $duracio = neteja_dades($_POST["duracio"] ?? "");
-  if(empty($duracio)){
-    $errores["duracio"] = "Duración es un campo obligatorio";
-  }
-
-  //any
-  $anyo = neteja_dades($_POST["any"] ?? "");
-  if(empty($anyo)){
-    $errores["any"] = "Año es un campo obligatorio";
-  }
-
-  //sinopsi
-  $sinopsi = neteja_dades($_POST["sinopsi"] ?? "");
-  if(empty($sinopsi)){
-    $errores["sinopsi"] = "Sinopsi es un campo obligatorio";
-  }
-
-  //imatge
-  if(!empty($_FILES["file_portada"]) && $_FILES["file_portada"]["error"]== 0){
-    $imatge = pujar_imatge("file_portada", $titol);
-  }
-
-  //id
-  $id = neteja_dades($_POST["id"] ?? "");
-
-
-  //No hay errores
-  if(empty($errores)){
-    
-    if(empty($id)){
-      $peli = new Peli();
-    } else {
-      $peli = PeliDAO::select($id);
+    if (!$peli) {
+      // Si no existe, redirigir con mensaje de error
+      $_SESSION["misssatge_error"] = "La pel·lícula amb ID $id no existeix.";
+      header("Location: index.php");
+      exit;
     }
 
+    // Si existe, cargar datos
+    $imatge_cap = (!empty($peli->getImatge())) ? "uploads/" . $peli->getImatge() : "assets/film.jpg";
+    $titol = $peli->getTitol();
+    $titol_pagina = $titol;
+    $imatge_portada = (!empty($peli->getImatge())) ? "uploads/" . $peli->getImatge() : "assets/proximamente.png";
+    $valoracio = $peli->getValoracio();
+    $director = $peli->getDirector();
+    $generes = $peli->getGenere();
+    $llista_generes_peli = explode(",", $generes);
+    $pais = $peli->getPais();
+    $duracio = $peli->getDuracio();
+    $anyo = $peli->getAny();
+    $sinopsi = $peli->getSinopsi();
+  }
+}
+
+// --- CASO POST: Insertar o actualizar película ---
+if (isset($_POST['formulari'])) {
+  $id = neteja_dades($_POST["id"]);
+  $titol = neteja_dades($_POST["titol"]);
+  $valoracio = neteja_dades($_POST["valoracio"]);
+  $director = neteja_dades($_POST["director"]);
+  $pais = neteja_dades($_POST["pais"]);
+  $generes = neteja_dades(implode(",", $_POST["genere"] ?? []));
+  $duracio = neteja_dades($_POST["duracio"]);
+  $anyo = neteja_dades($_POST["any"]);
+  $sinopsi = neteja_dades($_POST["sinopsi"]);
+
+  // Subida de imagen
+  $imatge_nova = "";
+  if (isset($_FILES['imatge_portada']) && $_FILES['imatge_portada']['error'] == 0) {
+    $imatge_nova = pujar_imatge("imatge_portada", $titol);
+  }
+
+  // --- Insertar nueva película ---
+  if (empty($id)) {
+    $peli = new Peli();
     $peli->setTitol($titol);
-    $peli->setValoracio($valoracio);
-    $peli->setPais($pais);
     $peli->setDirector($director);
-    $peli->setGenere($genere);
+    $peli->setValoracio($valoracio);
+    $peli->setGenere($generes);
+    $peli->setPais($pais);
     $peli->setDuracio($duracio);
     $peli->setAny($anyo);
     $peli->setSinopsi($sinopsi);
-    
-    if(!empty($imatge)){
-      $peli->setImatge($imatge);
+    if (!empty($imatge_nova)) {
+      $peli->setImatge($imatge_nova);
     }
 
-    //Insertamos la peli
-    if(empty($id)){
-      $id = PeliDAO::insert($peli);
-      $peli->setId($id);
-      $missatge_ok = "Película insertada correctamente";
-    } else {
-      PeliDAO::update($peli);
-      $missatge_ok = "Película actualizada correctamente";
+    $id = PeliDAO::insert($peli);
+    $peli->setId($id);
+    $is_insertat = true;
+  }
+  // --- Actualizar película existente ---
+  else {
+    $peli = PeliDAO::select($id);
+
+    if (!$peli) {
+      $_SESSION["misssatge_error"] = "No s'ha pogut actualitzar: la pel·lícula no existeix.";
+      header("Location: index.php");
+      exit;
     }
-    
+
+    $peli->setTitol($titol);
+    $peli->setDirector($director);
+    $peli->setValoracio($valoracio);
+    $peli->setGenere($generes);
+    $peli->setPais($pais);
+    $peli->setDuracio($duracio);
+    $peli->setAny($anyo);
+    $peli->setSinopsi($sinopsi);
+    if (!empty($imatge_nova)) {
+      $peli->setImatge($imatge_nova);
+    }
+
+    PeliDAO::update($peli);
+    $is_actualitzat = true;
   }
 
+  // Actualizar imágenes y página
+  if (!empty($peli->getImatge())) {
+    $imatge_cap = './uploads/' . $peli->getImatge();
+    $imatge_portada = './uploads/' . $peli->getImatge();
+  }
+
+  $llista_generes_peli = explode(",", $peli->getGenere());
+  $titol_pagina = $titol;
 }
 
-
 include_once __DIR__ . '/header.php';
-
 ?>
 
 <main>
   <div class="bg"
-    style="background-image: 
-url('assets/film.jpg'); 
-      background-size: cover; 
-      background-position: center; 
-      height: 30vh;">
+    style="background-image:url('<?= $imatge_cap ?>');
+      background-size:cover;
+      background-position:center;
+      height:30vh;">
     <section class="py-5 text-center container">
-
       <div class="row py-lg-5">
-
         <div class="col-lg-6 col-md-8 mx-auto text-white">
-          <h1 class="fw-light">Pelis DWES</h1>
-          <p class="lead">Projecte de prova de l'alumnat de DWES.</p>
-          <!--<p>
-          <a href="#" class="btn btn-primary my-2">Main call to action</a>
-          <a href="#" class="btn btn-secondary my-2">Secondary action</a>
-        </p>-->
+          <h1 class="fw-light"><?= $titol_pagina ?></h1>
+          <p class="lead"><?= $director ?: "Introdueix les dades de la nova pel·lícula" ?></p>
         </div>
       </div>
-
     </section>
   </div>
+
   <div class="album py-5 bg-light">
     <div class="container">
 
+      <?php if ($is_insertat): ?>
+        <div class="alert alert-success">Pel·lícula creada correctament!</div>
+      <?php elseif ($is_actualitzat): ?>
+        <div class="alert alert-success">Pel·lícula actualitzada correctament!</div>
+      <?php endif; ?>
+
       <div class="row g-5">
+        <!-- COLUMNA DERECHA -->
         <div class="col-md-5 col-lg-4 order-md-last">
-          <h4 class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-dark">Portada</span>
-          </h4>
-          <!-- imatge portada -->
+          <h4 class="mb-3 text-dark">Portada</h4>
           <div class="text-center">
-            <img src="assets/proximamente.png" class="object-fit-cover" alt="portada_peli" height="395" width="100%">
+            <img src="<?= $imatge_portada ?>" class="object-fit-cover" alt="portada" height="395" width="100%">
           </div>
-          <!-- Eliminar pel·lícula-->
-          <hr class="my-4">
-          <a href="#" class="w-100 btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            <i class="bi bi-trash"></i> Eliminar pel·lícula</a>
 
+          <?php if (!empty($id)): ?>
+            <hr class="my-4">
+            <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal">
+              <i class="bi bi-trash"></i> Eliminar pel·lícula
+            </a>
 
-          <!-- Delete Modal -->
-          <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h1 class="modal-title fs-5" id="deleteModalLabel">Eliminar pel·lícula</h1>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  Segur que vols eliminar la pel·lícula <strong>Joker</strong>?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
-                  <button type="button" class="btn btn-danger" onclick="window.location.href='delete_peli.php?id=100';">Sí, eliminar pel·lícula</button>
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Eliminar pel·lícula</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    Segur que vols eliminar <strong><?= $titol ?></strong>?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+                    <button type="button" class="btn btn-danger" onclick="window.location.href='delete_peli.php?id=<?= $id ?>'">Sí, eliminar</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-
+          <?php endif; ?>
         </div>
+
+        <!-- COLUMNA IZQUIERDA -->
         <div class="col-md-7 col-lg-8">
           <h4 class="mb-3">Dades de la pel·lícula</h4>
-          <form class="needs-validation" novalidate>
+          <form method="post" enctype="multipart/form-data" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="hidden" name="id" value="<?= $id ?>">
+
             <div class="row g-3">
               <div class="col-sm-6">
-                <label for="firstName" class="form-label">Títol</label>
-                <input type="text" class="form-control" name="titol" id="titol" placeholder="" value="" required>
-                <div class="invalid-feedback">
-                  El títol és obligatori
-                </div>
+                <label class="form-label">Títol</label>
+                <input type="text" class="form-control" name="titol" value="<?= $titol ?>" required>
               </div>
 
               <div class="col-md-6">
-                <label for="valoracio" class="form-label">Valoració (sobre 5)</label>
-                <select class="form-select" id="valoracio" required>
-                  <option value="">Valoració...</option>
-                  <option>5 - Excel·lent</option>
-                  <option>4 - Bona</option>
-                  <option>3 - Regular</option>
-                  <option>2 - Fluixa</option>
-                  <option>1 - Molt dolenta</option>
+                <label class="form-label">Valoració (1-5)</label>
+                <select class="form-select" name="valoracio" required>
+                  <?php for ($i = 5; $i >= 1; $i--): ?>
+                    <option value="<?= $i ?>" <?= ($valoracio == $i) ? "selected" : "" ?>><?= $i ?></option>
+                  <?php endfor; ?>
                 </select>
-                <div class="invalid-feedback">
-                  Selecciona una valoració.
-                </div>
               </div>
 
               <div class="col-6">
-                <label for="exampleDataList" class="form-label">País</label>
-                <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Escriu per buscar el nom del país..." required>
-                <datalist id="datalistOptions">
-                  <?php foreach ($llistaPaisosSelect as $pais): ?>
-                    <option value="<?= $pais ?>">
+                <label class="form-label">País</label>
+                <input class="form-control" list="paisos" name="pais" value="<?= $pais ?>" required>
+                <datalist id="paisos">
+                  <?php foreach ($llista_paisos_select as $pais_select): ?>
+                    <option value="<?= $pais_select ?>">
                   <?php endforeach; ?>
                 </datalist>
-                <div class="invalid-feedback">
-                  El país és invàlid
-                </div>
               </div>
 
               <div class="col-6">
-                <label for="director" class="form-label">Director</label>
-                <input type="text" class="form-control" id="director" placeholder="Director">
-                <div class="invalid-feedback">
-                  El director és invàlid
-                </div>
+                <label class="form-label">Director</label>
+                <input type="text" class="form-control" name="director" value="<?= $director ?>" required>
               </div>
 
               <div class="col-6">
-                <label for="genere" class="form-label">Gènere</label>
-                <select class="form-select" name="genere" id="genere" multiple aria-label="multiple select example">
-                  <?php foreach ($llistaGeneresSelect as $genereSelect): ?>
-                    <option value="<?= $genereSelect ?>"><?= $genereSelect ?></option>
+                <label class="form-label">Gènere</label>
+                <select class="form-select" name="genere[]" multiple required>
+                  <?php foreach ($llista_generes_select as $genere_select): ?>
+                    <option value="<?= $genere_select ?>" <?= in_array($genere_select, $llista_generes_peli) ? "selected" : "" ?>><?= $genere_select ?></option>
                   <?php endforeach; ?>
                 </select>
-                <div class="invalid-feedback">
-                  Selecciona un génere
-                </div>
               </div>
 
               <div class="col-3">
-                <label for="duracio" class="form-label">Duració (minuts)</label>
-                <input type="number" class="form-control" id="duracio" placeholder="100">
-                <div class="invalid-feedback">
-                  Duració invàlida
-                </div>
+                <label class="form-label">Duració (min)</label>
+                <input type="number" class="form-control" name="duracio" value="<?= $duracio ?>" required>
               </div>
+
               <div class="col-3">
-                <label for="any" class="form-label">Any</label>
-                <input type="number" class="form-control" id="any" placeholder="2024">
-                <div class="invalid-feedback">
-                  Any invàlid
-                </div>
+                <label class="form-label">Any</label>
+                <input type="number" class="form-control" name="any" value="<?= $anyo ?>" required>
               </div>
 
               <div class="col-12">
-                <label for="exampleFormControlTextarea1" class="form-label">Sinopsi</label>
-                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                <label class="form-label">Sinopsi</label>
+                <textarea class="form-control" name="sinopsi" rows="3" required><?= $sinopsi ?></textarea>
               </div>
 
               <div class="col-12">
-                <label for="file_portada" class="form-label">Imatge portada</label>
-                <input type="file" class="form-control" name="file_portada" placeholder="imatge_portada">
+                <label class="form-label">Imatge portada</label>
+                <input type="file" class="form-control" name="imatge_portada" accept="image/*">
               </div>
+            </div>
 
-
-            </div>
-            <!--
             <hr class="my-4">
-  
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="same-address">
-              <label class="form-check-label" for="same-address">Shipping address is the same as my billing address</label>
-            </div>
-  
-            <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="save-info">
-              <label class="form-check-label" for="save-info">Save this information for next time</label>
-            </div>
-  
-            <hr class="my-4">
-  
-            <h4 class="mb-3">Payment</h4>
-  
-            <div class="my-3">
-              <div class="form-check">
-                <input id="credit" name="paymentMethod" type="radio" class="form-check-input" checked required>
-                <label class="form-check-label" for="credit">Credit card</label>
-              </div>
-              <div class="form-check">
-                <input id="debit" name="paymentMethod" type="radio" class="form-check-input" required>
-                <label class="form-check-label" for="debit">Debit card</label>
-              </div>
-              <div class="form-check">
-                <input id="paypal" name="paymentMethod" type="radio" class="form-check-input" required>
-                <label class="form-check-label" for="paypal">PayPal</label>
-              </div>
-            </div>
-  
-            <div class="row gy-3">
-              <div class="col-md-6">
-                <label for="cc-name" class="form-label">Name on card</label>
-                <input type="text" class="form-control" id="cc-name" placeholder="" required>
-                <small class="text-muted">Full name as displayed on card</small>
-                <div class="invalid-feedback">
-                  Name on card is required
-                </div>
-              </div>
-  
-              <div class="col-md-6">
-                <label for="cc-number" class="form-label">Credit card number</label>
-                <input type="text" class="form-control" id="cc-number" placeholder="" required>
-                <div class="invalid-feedback">
-                  Credit card number is required
-                </div>
-              </div>
-  
-              <div class="col-md-3">
-                <label for="cc-expiration" class="form-label">Expiration</label>
-                <input type="text" class="form-control" id="cc-expiration" placeholder="" required>
-                <div class="invalid-feedback">
-                  Expiration date required
-                </div>
-              </div>
-  
-              <div class="col-md-3">
-                <label for="cc-cvv" class="form-label">CVV</label>
-                <input type="text" class="form-control" id="cc-cvv" placeholder="" required>
-                <div class="invalid-feedback">
-                  Security code required
-                </div>
-              </div>
-            </div>
-            -->
-            <hr class="my-4">
-
-            <button class="w-100 btn btn-primary btn-lg" type="submit"><i class="bi bi-floppy"></i> Guardar pel·lícula</button>
+            <button class="btn btn-primary w-100" type="submit" name="formulari" value="formulari">
+              <i class="bi bi-floppy"></i> Guardar pel·lícula
+            </button>
           </form>
         </div>
       </div>
     </div>
   </div>
-
 </main>
 
-<?php
-include_once __DIR__ . '/footer.php';
+<?php include_once __DIR__ . '/footer.php'; ?>
