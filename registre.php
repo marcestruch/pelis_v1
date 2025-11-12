@@ -1,11 +1,10 @@
-
 <?php
+session_start();
 include_once __DIR__.'/models/Usuari.php';
 include_once __DIR__.'/models/UsuariDAO.php';
 include_once __DIR__.'/models/utils.php';
 //Si se envia te deja entrar a este if
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-session_start();
   //Limpiar datos recibidos
   $email= neteja_dades($_POST['email']);
   $pass= neteja_dades($_POST['pass1']);
@@ -23,7 +22,7 @@ session_start();
     header("Location: index.php");
     exit;
   }
-  if(!$pass===$confirm_pass){
+  if($pass !== $confirm_pass){
     $_SESSION['misssatge_error']= "La contraseña no coincide";
     header("Location: index.php");
     exit;
@@ -33,6 +32,9 @@ session_start();
   $pass=password_hash($pass, PASSWORD_DEFAULT);
   $usuari->setPass($pass);
   UsuariDAO::insert($usuari);
+  $_SESSION['misssatge_error'] = "Compte creat correctament! Ja pots iniciar sessió.";
+  header("Location: login.php");
+exit;
 }
 
 
