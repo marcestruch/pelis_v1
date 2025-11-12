@@ -23,5 +23,24 @@ class UsuariDAO{
         }
         return null;
     }
+    public static function insert($usuari)
+    {
+        $conn = DBConnection::connectDB();
+        if (!is_null($conn)) {
+            $stmt = $conn->prepare("INSERT INTO usuaris(id,  
+                                          email,
+                                          pass)
+                                     VALUES(:id,  
+                                            :email,
+                                            :pass)");
+            $stmt->execute([
+                'id' => null,
+                'email' => $usuari::getEmail(),
+                'pass' => $usuari::getPass()
+            ]);
+            return $conn->lastInsertId();
+        }
+        return 0;
+    }
 }
 ?>

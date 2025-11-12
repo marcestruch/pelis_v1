@@ -1,5 +1,31 @@
 
 <?php
+include_once __DIR__.'/models/Usuari.php';
+include_once __DIR__.'/models/UsuariDAO.php';
+include_once __DIR__.'/models/utils.php';
+//Si se envia te deja entrar a este if
+session_start();
+
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+//Limpiar datos recibidos
+$email= neteja_dades($_POST['email']);
+$pass= neteja_dades($_POST['pass']);
+  //verificar que no esten vacios los campos
+  if(empty($email) || empty($pass)){
+    $_SESSION['misssatge_error']= "Te falta algun campo por rellenar porfavor intentalo otra vez entrando a registrarse";
+    header("Location: index.php");
+    exit;
+  }
+  //verificar si ya existe email
+  if($email == UsuariDAO::selectByMail($email)){
+    $_SESSION['misssatge_error']= "El usuario con email:".$email." ya existe.";
+    header("Location: index.php");
+    exit;
+  }
+  
+}
+
+
 include_once __DIR__ . '/header.php';
 ?>
 
