@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/Peli.php';
+require_once __DIR__ . '/Usuari.php';
 require_once __DIR__ . '/DBConnection.php';
 require_once __DIR__ . '/IDbAccess.php';
 
@@ -14,7 +14,7 @@ class UsuariDAO{
                                            pass
                                      FROM usuaris
                                      WHERE email = :email");
-            $stmt->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Peli');
+            $stmt->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Usuari');
             $stmt->execute(['email'=>$email]);
             $usuari = $stmt->fetch();
             if($usuari){
@@ -27,7 +27,7 @@ class UsuariDAO{
     {
         $conn = DBConnection::connectDB();
         if (!is_null($conn)) {
-            $stmt = $conn->prepare("INSERT INTO usuaris(id,  
+            $stmt = $conn->prepare("INSERT INTO usuaris(id,
                                           email,
                                           pass)
                                      VALUES(:id,  
@@ -35,9 +35,8 @@ class UsuariDAO{
                                             :pass)");
             $stmt->execute([
                 'id' => null,
-                'email' => $usuari::getEmail(),
-                'pass' => $usuari::getPass()
-            ]);
+                'email' => $usuari->getEmail(),
+                'pass' => $usuari->getPass()]);
             return $conn->lastInsertId();
         }
         return 0;
