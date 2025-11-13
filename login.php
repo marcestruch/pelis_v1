@@ -3,23 +3,55 @@ session_start();
 include_once __DIR__.'/models/Usuari.php';
 include_once __DIR__.'/models/UsuariDAO.php';
 include_once __DIR__.'/models/utils.php';
-if($_SERVER["REQUEST_METHOD"] == "POST"){
-  //Limpiar datos recibidos
-  $email= neteja_dades($_POST['email']);
-  $pass= neteja_dades($_POST['pass1']);
-  //verificar que no esten vacios los campos
-  if(empty($email) || empty($pass)){
-    $_SESSION['misssatge_error']= "Te falta algun campo por rellenar porfavor intentalo otra vez entrando a registrarse";
+
+// Si arriba d'un registre correcte, mostra el missatge d'èxit!
+$missatge_ok = "";
+if (!empty($_SESSION['missatge_ok'])) {
+    $missatge_ok = $_SESSION['missatge_ok'];
+    $_SESSION['missatge_ok'] = "";
+}
+
+$missatge_error = "";
+if (!empty($_SESSION['misssatge_error'])) {
+    $missatge_error = $_SESSION['misssatge_error'];
+    $_SESSION['misssatge_error'] = "";
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = neteja_dades($_POST['usuari']);
+    $pass = neteja_dades($_POST['password']);
+
+    if (empty($email) || empty($pass)) {
+        $_SESSION['misssatge_error'] = "Cal completar tots els camps.";
+        header("Location: login.php");
+        exit;
+    }
+
+    $usuari = UsuariDAO::selectByMail($email);
+    if (!$usuari) {
+        $_SESSION['misssatge_error'] = "No s'ha trobat cap usuari amb aquest email.";
+        header("Location: login.php");
+        exit;
+    }
+
+    if (!password_verify($pass, $usuari->getPass())) {
+        $_SESSION['misssatge_error'] = "La contrasenya no és correcta.";
+        header("Location: login.php");
+        exit;
+    }
+
+    // Si arriba aquí: login correcte
+    $_SESSION['usuari'] = $usuari->getEmail();
+
+    // Recordar (cookie 30 dies)
+    if (!empty($_POST['recordar'])) {
+        setcookie("usuari_recordat", $usuari->getEmail(), time() + (30 * 24 * 60 * 60), "/");
+    } else {
+        setcookie("usuari_recordat", "", time() - 3600, "/");
+    }
+
     header("Location: index.php");
     exit;
-  }
-  //verificar si no existe email
-  $hayEmail = UsuariDAO::selectByMail($email);
-  if(!$hayEmail){
-    $_SESSION['misssatge_error']= "El usuario con email:".$email." no existe.";
-    header("Location: index.php");
-    exit;
-  }
 }
 include_once __DIR__ . '/header.php';
 ?>
@@ -28,15 +60,12 @@ include_once __DIR__ . '/header.php';
     <div class="card" style="width: 24rem;">
       <div class="card-body">
         <h5 class="card-title text-center mb-4">Iniciar Sessió</h5>
-        <?php
-          if(!empty($missatge_error)):
-        ?>
-          <div class="alert alert-danger" role="alert">
-            <?= $missatge_error?>
-          </div>
-        <?php
-          endif;
-        ?>
+        <?php if ($missatge_error): ?>
+          <div class="alert alert-danger" role="alert"><?= $missatge_error ?></div>
+        <?php endif; ?>
+        <?php if ($missatge_ok): ?>
+          <div class="alert alert-success" role="alert"><?= $missatge_ok ?></div>
+        <?php endif; ?>
         <form action="#" method="post">
           <!-- Usuari -->
           <div class="mb-3">
@@ -52,7 +81,7 @@ include_once __DIR__ . '/header.php';
 
           <!-- Recordar -->
           <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="recordar">
+            <input type="checkbox" class="form-check-input" id="recordar" name="recordar" <?= isset($_COOKIE["usuari_recordat"]) ? "checked" : "" ?>>
             <label class="form-check-label" for="recordar">Recorda'm</label>
           </div>
 

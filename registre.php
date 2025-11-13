@@ -32,7 +32,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   $pass=password_hash($pass, PASSWORD_DEFAULT);
   $usuari->setPass($pass);
   UsuariDAO::insert($usuari);
-  $_SESSION['misssatge_error'] = "Compte creat correctament! Ja pots iniciar sessió.";
+  $_SESSION['missatge_ok'] = "Compte creat correctament! Ja pots iniciar sessió.";
   header("Location: login.php");
 exit;
 }
