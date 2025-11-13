@@ -1,11 +1,23 @@
 <?php
 require_once __DIR__.'/models/Peli.php';
 require_once __DIR__.'/models/PeliDAO.php';
+require_once __DIR__.'/models/Usuari.php';
+require_once __DIR__.'/models/UsuariDAO.php';
 $llistaPelis = PeliDAO::getAll();
 session_start();
 
 //Comprovar
 
+//Si te dins algo (Hi ha usuari)
+if(!empty($_SESSION["usuari"])){
+  $usuariActiu=true;
+  $nom = $_SESSION["usuari"];
+}else{
+  //si no
+  $usuariActiu=false;
+  $nom = "Guest";
+}
+//si te dins algo (Error)
 if(!empty($_SESSION["misssatge_error"])){
   $missatge_error=$_SESSION["misssatge_error"];
   $_SESSION["misssatge_error"]="";
@@ -70,7 +82,16 @@ foreach($llistaPelis as $peli):
                 <small class="text-muted"><?= $peli->getAny()?></small>
                 <div class="btn-group">
                   <a href="peliview.php?id=<?= $peli->getId()?>" class="btn btn-dark"><i class="fa fa-eye"></i></a>
+                  
+                  <?php
+                    if($usuariActiu):
+                  ?>
+
                   <a href="peliedit.php?id=<?= $peli->getId()?>" class="btn btn-danger"><i class="fa fa-pencil-square"></i></a>
+                  
+                  <?php
+                    endif;
+                  ?>
                 </div>
 
 

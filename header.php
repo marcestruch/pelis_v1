@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -49,11 +50,33 @@
           <p class="text-white">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>-->
         </div>
         <div class="col-sm-4 offset-md-1 py-4">
-          <h4 class="text-white">Admin</h4>
+          <h4 class="text-white"><?= $nom?></h4>
           <ul class="list-unstyled">
+            
+            <?php
+              //Si la variable $usuariActiu te true ensenyara = (Es correcte = true)
+              if($usuariActiu):
+            ?>
+            
             <li><a href="peliedit.php" class="text-white">Afegir nova pel·lícula</a></li>
+            <li><a href="tancarsessio.php" class="text-white">Tancar sessio</a></li>
+
+            <?php
+              endif;
+            ?>
+            
+            
+            <?php
+              //Si la variable $usuariActiu te dins false ensenyara = (No es correcte = false)
+              if(!$usuariActiu):
+            ?>
+            
             <li><a href="login.php" class="text-white">Accedir</a></li>
             <li><a href="registre.php" class="text-white">Registrar-se</a></li>
+            
+            <?php
+              endif;
+            ?>
           </ul>
         </div>
       </div>
