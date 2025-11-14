@@ -4,6 +4,13 @@ include_once __DIR__.'/models/Usuari.php';
 include_once __DIR__.'/models/UsuariDAO.php';
 include_once __DIR__.'/models/utils.php';
 
+
+//controla que no entre ningun usuari per URL
+if(!empty($_SESSION["usuari"])){
+  $_SESSION["misssatge_error"] = "No pots accedir eres usuari";
+  header("Location: index.php");
+  exit;
+}
 // Si arriba d'un registre correcte, mostra el missatge d'èxit!
 $missatge_ok = "";
 if (!empty($_SESSION['missatge_ok'])) {

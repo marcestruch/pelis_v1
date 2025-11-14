@@ -40,6 +40,12 @@ $llista_generes_select = [
   'Història',
   'Terror'
 ];
+//no deixar que entre per URL
+if(empty($_SESSION["usuari"])){
+  $_SESSION["misssatge_error"] = "No pots accedir no eres usuari";
+  header("Location: index.php");
+  exit;
+}
 
 // --- CASO GET: Cargar datos si hay ID ---
 if ($_SERVER['REQUEST_METHOD'] == "GET") {

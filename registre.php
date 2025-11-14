@@ -3,6 +3,14 @@ session_start();
 include_once __DIR__.'/models/Usuari.php';
 include_once __DIR__.'/models/UsuariDAO.php';
 include_once __DIR__.'/models/utils.php';
+
+//controla que no entre ningun usuari per URL
+if(!empty($_SESSION["usuari"])){
+  $_SESSION["misssatge_error"] = "No pots accedir eres usuari";
+  header("Location: index.php");
+  exit;
+}
+
 //Si se envia te deja entrar a este if
 if($_SERVER["REQUEST_METHOD"] == "POST"){
   //Limpiar datos recibidos

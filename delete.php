@@ -1,6 +1,12 @@
 <?php
 require_once __DIR__ . '/models/PeliDAO.php';
 session_start();
+//controla que el no entre ningun no usuari en una id afegida per URL
+if(empty($_SESSION["usuari"])){
+  $_SESSION["misssatge_error"] = "No pots accedir no eres usuari";
+  header("Location: index.php");
+  exit;
+}
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     $_SESSION['misssatge_error'] = "ID invàlid per eliminar la pel·lícula.";
