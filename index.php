@@ -6,6 +6,11 @@ require_once __DIR__.'/models/UsuariDAO.php';
 $llistaPelis = PeliDAO::getAll();
 session_start();
 
+//si te dins algo (Error)
+if(!empty($_SESSION["misssatge_error"])){
+  $missatge_error=$_SESSION["misssatge_error"];
+  $_SESSION["misssatge_error"]="";
+}
 // Cerca per títol o director
 if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['peli_query'])) {
   $peli_query = trim($_POST['peli_query']);
@@ -24,11 +29,6 @@ if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
   //si no
   $usuariActiu=false;
   $nom = "Guest";
-}
-//si te dins algo (Error)
-if(!empty($_SESSION["misssatge_error"])){
-  $missatge_error=$_SESSION["misssatge_error"];
-  $_SESSION["misssatge_error"]="";
 }
 
 include_once __DIR__ . '/header.php';
