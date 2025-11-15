@@ -54,6 +54,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     $usuari->setEmail($email);
     $usuari->setPass(password_hash($pass, PASSWORD_DEFAULT));
     UsuariDAO::insert($usuari);
+    $_SESSION['misssatge_error']="";
     $_SESSION['missatge_ok'] = "Compte creat correctament! Ja pots iniciar sessió.";
     header("Location: login.php");
     exit;
