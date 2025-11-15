@@ -7,6 +7,7 @@ require_once __DIR__ . '/IDbAccess.php';
 //class PeliDao implements IDbAccess
 class PeliDAO
 {
+    //retorna totes les pelicules de la base de dades com array de objectes
     public static function getAll(): ?array
     {
         $conn = DBConnection::connectDB();
@@ -29,6 +30,8 @@ class PeliDAO
             return null;
         }
     }
+
+    //retorna un objecte pelicula pel seu id
     public static function select($id): ?Peli
     {
         $conn = DBConnection::connectDB();
@@ -54,6 +57,8 @@ class PeliDAO
         }
         return null;
     }
+
+    //Actualitza una pelicula ja existent
 
     public static function update($object): int
     {
@@ -84,6 +89,8 @@ class PeliDAO
         }
         return 0;
     }
+
+    //Inserta objecte pelicula per inserir una nova pelicula en la base de dades 
     public static function insert($peli)
     {
         $conn = DBConnection::connectDB();
@@ -124,6 +131,9 @@ class PeliDAO
         }
         return 0;
     }
+    
+    //Elimina una pelicula de la base de dades donat un id
+
     public static function delete($id): bool
     {
     $conn = DBConnection::connectDB();
@@ -145,6 +155,9 @@ class PeliDAO
     }
     return false;
 }
+
+//busca pelicules pel titol o director
+
 public static function getSearch($peli_buscada): ?array
     {
         $conn = DBConnection::connectDB();
@@ -169,6 +182,9 @@ public static function getSearch($peli_buscada): ?array
             return null;
         }
     }
+
+//Busca pelicules donat un genere
+
 public static function getByGenere($genere): ?array
 {
     $conn = DBConnection::connectDB();
