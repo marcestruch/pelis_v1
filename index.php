@@ -6,7 +6,13 @@ require_once __DIR__.'/models/UsuariDAO.php';
 $llistaPelis = PeliDAO::getAll();
 session_start();
 
-//Comprovar
+// Cerca per títol o director
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['peli_query'])) {
+  $peli_query = trim($_POST['peli_query']);
+  $llistaPelis = PeliDAO::getSearch($peli_query);
+} else {
+  $llistaPelis = PeliDAO::getAll();
+}
 
 //Si te dins algo (Hi ha usuari)
 if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
@@ -93,8 +99,6 @@ foreach($llistaPelis as $peli):
                     endif;
                   ?>
                 </div>
-
-
               </div>
             </div>
           </div>

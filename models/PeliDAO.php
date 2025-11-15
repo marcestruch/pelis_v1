@@ -145,6 +145,30 @@ class PeliDAO
     }
     return false;
 }
+public static function getSearch($peli_buscada): ?array
+    {
+        $conn = DBConnection::connectDB();
+        if (!is_null($conn)) {
+            $stmt = $conn->prepare("SELECT id, 
+                                           titol,
+                                           valoracio,
+                                           pais,
+                                           director,
+                                           genere,
+                                           duracio,
+                                           anyo,
+                                           sinopsi,
+                                           imatge
+                                     FROM pelis
+                                     WHERE titol LIKE :query OR director LIKE :query");
+            $search = '%' . $peli_buscada . '%';
+            $stmt->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Peli');
+            $stmt->execute(['query' => $search]);
+            return $stmt->fetchAll();
+        } else {
+            return null;
+        }
+    }
 
 }
 
