@@ -4,6 +4,15 @@ include_once __DIR__.'/models/Usuari.php';
 include_once __DIR__.'/models/UsuariDAO.php';
 include_once __DIR__.'/models/utils.php';
 
+
+if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
+  $usuariActiu=true;
+  $nom = $_SESSION["usuari"] ?? $_COOKIE['usuari_recordat'];
+}else{
+  //si no
+  $usuariActiu=false;
+  $nom = "Guest";
+}
 //controla que no entre ningun usuari per URL
 if(!empty($_SESSION["usuari"])){
   $_SESSION["misssatge_error"] = "No pots accedir eres usuari";

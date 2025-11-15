@@ -40,6 +40,14 @@ $llista_generes_select = [
   'Història',
   'Terror'
 ];
+if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
+  $usuariActiu=true;
+  $nom = $_SESSION["usuari"] ?? $_COOKIE['usuari_recordat'];
+}else{
+  //si no
+  $usuariActiu=false;
+  $nom = "Guest";
+}
 //no deixar que entre per URL
 if(empty($_SESSION["usuari"])){
   $_SESSION["misssatge_error"] = "No pots accedir no eres usuari";

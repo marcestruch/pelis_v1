@@ -9,9 +9,9 @@ session_start();
 //Comprovar
 
 //Si te dins algo (Hi ha usuari)
-if(!empty($_SESSION["usuari"])){
+if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
   $usuariActiu=true;
-  $nom = $_SESSION["usuari"];
+  $nom = $_SESSION["usuari"] ?? $_COOKIE['usuari_recordat'];
 }else{
   //si no
   $usuariActiu=false;

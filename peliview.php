@@ -4,7 +4,14 @@ require_once __DIR__.'/models/PeliDAO.php';session_start();
 
 
 include_once __DIR__.'/models/utils.php';
-
+if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
+  $usuariActiu=true;
+  $nom = $_SESSION["usuari"] ?? $_COOKIE['usuari_recordat'];
+}else{
+  //si no
+  $usuariActiu=false;
+  $nom = "Guest";
+}
 $peli = null;
 if ($_SERVER['REQUEST_METHOD'] == "GET") {
   if(isset($_GET["id"]) && !empty($_GET["id"])){
