@@ -169,7 +169,29 @@ public static function getSearch($peli_buscada): ?array
             return null;
         }
     }
-
+public static function getByGenere($genere): ?array
+{
+    $conn = DBConnection::connectDB();
+    if (!is_null($conn)) {
+        $stmt = $conn->prepare("SELECT id, 
+                                       titol,
+                                       valoracio,
+                                       pais,
+                                       director,
+                                       genere,
+                                       duracio,
+                                       anyo,
+                                       sinopsi,
+                                       imatge
+                                 FROM pelis
+                                 WHERE genere LIKE :genere");
+        $stmt->setFetchMode(PDO::FETCH_CLASS | PDO::FETCH_PROPS_LATE, 'Peli');
+        $search_genere = '%' . $genere . '%';
+        $stmt->execute(['genere' => $search_genere]);
+        return $stmt->fetchAll();
+    }
+    return null;
+}
 }
 
 

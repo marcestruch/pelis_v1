@@ -10,10 +10,12 @@ session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['peli_query'])) {
   $peli_query = trim($_POST['peli_query']);
   $llistaPelis = PeliDAO::getSearch($peli_query);
-} else {
+} else if(isset($_GET["genere"]) && !empty($_GET["genere"])){
+  $genere = $_GET["genere"];
+  $llistaPelis = PeliDAO::getByGenere($genere);
+}else{
   $llistaPelis = PeliDAO::getAll();
 }
-
 //Si te dins algo (Hi ha usuari)
 if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
   $usuariActiu=true;

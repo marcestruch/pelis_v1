@@ -88,7 +88,7 @@ include_once __DIR__ . '/header.php';
                 <?php
                 $llista_generes = explode(",", $peli->getGenere());
                 foreach($llista_generes as $genere){
-                  echo "<a href=\"#\" class=\"btn btn-primary\">$genere</a>\n";
+                  echo "<a href=\"index.php?genere=" . urlencode(trim($genere)) . "\" class=\"btn btn-primary\">$genere</a>\n";
                 }
                 ?>
               </p>
