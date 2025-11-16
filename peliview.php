@@ -9,22 +9,41 @@ require_once __DIR__.'/models/UsuariDAO.php';
 require_once __DIR__.'/models/Valoracio.php';
 require_once __DIR__.'/models/ValoracioDAO.php';
 require_once __DIR__.'/models/utils.php';
+
 session_start();
+
 // Control de sessió d'usuari actiu.
+
 if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
+
+    //Usuario logueado
+
     $usuariActiu = true;
+
+    //Le doy nombre el email almacenado en la session o en la cookie a la variable para que lo tenga en cuenta en caso de que haya usuarioActivo
+
     $nom = $_SESSION["usuari"] ?? $_COOKIE['usuari_recordat'];
+
 } else {
+
+    //Usuario no logueado
+
     $usuariActiu = false;
+    
+    //Le doy nombre guest=invitado a la variable para que lo tenga en cuenta en caso de q no haya usuarioActivo
+
     $nom = "Guest";
+
 }
 
 // Carrega la pel·lícula pel seu id (GET).
 
 $peli = null;
 $valoracio = null;
+
 if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["id"])) {
 
+    //Limpiar datos y obtener el objeto pelicula con id
 
     $id = neteja_dades($_GET["id"]);
     $peli = PeliDAO::select($id);
