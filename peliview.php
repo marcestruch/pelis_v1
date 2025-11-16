@@ -4,6 +4,10 @@
  */
 require_once __DIR__.'/models/Peli.php';
 require_once __DIR__.'/models/PeliDAO.php';
+require_once __DIR__.'/models/Usuari.php';
+require_once __DIR__.'/models/UsuariDAO.php';
+require_once __DIR__.'/models/Valoracio.php';
+require_once __DIR__.'/models/ValoracioDAO.php';
 require_once __DIR__.'/models/utils.php';
 session_start();
 
@@ -21,6 +25,13 @@ $peli = null;
 if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["id"])) {
     $id = neteja_dades($_GET["id"]);
     $peli = PeliDAO::select($id);
+    //Si es un usuario ve su valoracion
+    if($usuariActiu){
+        $usuari_email = $_SESSION['usuari'] ?? $_COOKIE['usuari_recordat'];
+        $usuari = UsuariDAO::selectByMail($usuari_email);
+        $usuari_id = $usuari->getId();
+        $valoracio = ValoracioDAO::selectByUserPeliId($usuari_id, $id);
+    }
 }
 
 // Si no existeix la pel·lícula, mostra missatge i redirigeix a home.
@@ -89,7 +100,8 @@ include_once __DIR__ . '/header.php';
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> 
+                <p>Tu valoracion a esta pelicula es <?= $valPropia = $valoracio->getValoracio()?></p>
             </div>
         </div>
     <?php endif; ?>
