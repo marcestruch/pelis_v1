@@ -109,17 +109,22 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["i
                 
                 $valDisabled ="disabled";
             }
-    
         }
     }
+    
+    //Dar valoracion Media a todos 
+
     $valoracioMedia = ValoracioDAO::selectMediaByPeliId($id);
     
+    //Si valoracionMedia no esta vacia Redondea el resultado a dos decimales con Round
+
     if(!empty($valoracioMedia)){
         $valoracioMedia = round($valoracioMedia, 2);
     }
 }
 
-// Si no existeix la pel·lícula, mostra missatge i redirigeix a home.
+// Si no existeix la pel·lícula, mostra missatge i redirigeix a home. Podria ser un else arriba
+
 if(empty($peli)){
     $_SESSION["misssatge_error"] = "No s'ha trobat la pel·lícula.";
     header('Location: index.php');
