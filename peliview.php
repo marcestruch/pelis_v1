@@ -53,9 +53,12 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["i
             ValoracioDAO::insertarValoracio($valoracio);
             
             //Al recibir la informacion obtiene la valoracion
+            //Esta variable acoje tu valoracion en esa pelicula
             
             $valPropia = $valoracio->getValoracio();
         
+            //Esta variable deshabilitara el boton de enviar valoracion
+
             $valDisabled ="disabled";
 
         }else{
@@ -67,12 +70,24 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["i
             $usuari_id = $usuari->getId();
             $valoracio = ValoracioDAO::selectByUserPeliId($usuari_id, $id);        
             if(empty($valoracio)){
-        
+                
+                //Esta variable controla que no has valorado aun evitando un error por null pointer
+
                 $valPropia = "No has valorado aun";
+                
+                //Esta variable habilitara el boton de enviar valoracion
+                
                 $valDisabled ="enabled";
+                
+                //si no
             }else{
-        
+                
+                //Esta variable acoje tu valoracion en esa pelicula
+
                 $valPropia = $valoracio->getValoracio();
+                
+                //Esta variable deshabilitara el boton de enviar valoracion
+                
                 $valDisabled ="disabled";
             }
     
