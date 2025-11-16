@@ -18,10 +18,13 @@ class ValoracioDAO{
             $valoracio = $stmt->fetch(); 
             if($valoracio){
                 return $valoracio;
-            }    
+            }else{
+                return null;
+            }
         }
         return null;
     }
+    
     public static function insertarValoracio($valoracio)
     {
         $conn = DBConnection::connectDB();
@@ -35,6 +38,19 @@ class ValoracioDAO{
             return $conn->lastInsertId();
         }
         return 0;
+    }
+    // Devuelve objeto con la media
+    public static function selectMediaByPeliId($peli_id)
+    {
+        $conn= DBConnection::connectDB();
+        if(!is_null($conn)){
+            $stmt = $conn->prepare("SELECT AVG(valoracio)
+                                    FROM valoracions
+                                    WHERE peli_id = :peli_id");
+            $stmt->execute(['peli_id'=>$peli_id]);
+            return $stmt->fetch()[0];    
+        }
+        return null;
     }
 }
 ?>

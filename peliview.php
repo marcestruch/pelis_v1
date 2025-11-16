@@ -20,17 +20,64 @@ if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
 }
 
 // Carrega la pel·lícula pel seu id (GET).
+
 $peli = null;
-if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["id"]) || isset($_GET["id"]) && !empty($_GET["id"])) {
+$valoracio = null;
+if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["id"])) {
+
+
     $id = neteja_dades($_GET["id"]);
     $peli = PeliDAO::select($id);
-    //Si es un usuario ve su valoracion
+    
     if($usuariActiu){
-        $usuari_email = $_SESSION['usuari'] ?? $_COOKIE['usuari_recordat'];
-        $usuari = UsuariDAO::selectByMail($usuari_email);
-        $usuari_id = $usuari->getId();
-        $valoracio = ValoracioDAO::selectByUserPeliId($usuari_id, $id);
+
+        //Si viene de enviar el formulario con la valoracion y es usuario
+        
+        
+        if($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["id"]) && isset($_GET["valoracio"])){
+        
+        
+            //Obtengo la id del usuari
+        
+            $usuari_email = $_SESSION['usuari'] ?? $_COOKIE['usuari_recordat'];
+            $usuari = UsuariDAO::selectByMail($usuari_email);
+            $usuari_id = $usuari->getId();
+        
+            //Creo una nueva valoracion para insetar el objeto seteado con los atributos correspondientes
+            
+            $valoracio = new Valoracio();
+            $valoracio -> setId(null);
+            $valoracio -> setPeliId($id);
+            $valoracio -> setUsuariId($usuari_id);
+            $valoracio ->setValoracio($_GET['valoracio']);
+            ValoracioDAO::insertarValoracio($valoracio);
+            
+            //Al recibir la informacion obtiene la valoracion
+            
+            $valPropia = $valoracio->getValoracio();
+        
+        }else{
+        
+            //¡¡si no!!, es usuario pero no ha enviado valoracion
+        
+            $usuari_email = $_SESSION['usuari'] ?? $_COOKIE['usuari_recordat'];
+            $usuari = UsuariDAO::selectByMail($usuari_email);
+            $usuari_id = $usuari->getId();
+            $valoracio = ValoracioDAO::selectByUserPeliId($usuari_id, $id);        
+            if(empty($valoracio)){
+        
+                $valPropia = "No has valorado aun";
+        
+            }else{
+        
+                $valPropia = $valoracio->getValoracio();
+        
+            }
+    
+        }
     }
+    $valoracioMedia = ValoracioDAO::selectMediaByPeliId($id);
+    $valoracioMedia = round($valoracioMedia, 2);
 }
 
 // Si no existeix la pel·lícula, mostra missatge i redirigeix a home.
@@ -75,7 +122,8 @@ include_once __DIR__ . '/header.php';
                                     <span class="ms-3">
                                         <?php
                                         $i = 1;
-                                        while($i <= $peli->getValoracio()){
+                                        $valEstrella = $valoracioMedia;
+                                        while($i <= $valEstrella){
                                             echo '<i class="bi bi-star-fill fs-5"></i>';
                                             $i++;
                                         }
@@ -100,6 +148,12 @@ include_once __DIR__ . '/header.php';
                         </div>
                     </div>
                 </div> 
+                <div>
+                    <p>La valoracion media es: <?= $valoracioMedia ?? 0?></p>
+                </div>
+                <?php
+                if($usuariActiu):
+                ?>
                 <div class="form">
                     <form method="get">
                         <input type="hidden" name="id" value="<?= $_GET['id'] ?? '' ?>">
@@ -110,8 +164,11 @@ include_once __DIR__ . '/header.php';
                         <input type="radio" name="valoracio" id="5" value="<?= 5?>">
                         <button type="submit">Enviar valoracio</button>
                     </form>
-                    <p>Tu valoracion a esta pelicula es <?= $valPropia = $valoracio->getValoracio()?></p>
+                    <p>Tu valoracion a esta pelicula es <?= $valPropia ?? "" ?></p>
                 </div>
+                <?php
+                endif;
+                ?>
             </div>
         </div>
     <?php endif; ?>
