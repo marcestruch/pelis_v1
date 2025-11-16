@@ -22,5 +22,19 @@ class ValoracioDAO{
         }
         return null;
     }
+    public static function insertarValoracio($valoracio)
+    {
+        $conn = DBConnection::connectDB();
+        if(!is_null($conn)){
+            $stmt = $conn->prepare("INSERT INTO valoracions(id, peli_id, usuari_id, valoracio) VALUES (null, :peli_id, :usuari_id, :valoracio)");
+            $stmt->execute([
+                'peli_id'=>$valoracio->getPeliId(),
+                'usuari_id'=>$valoracio->getUsuariId(),
+                'valoracio'=>$valoracio->getValoracio()
+            ]);
+            return $conn->lastInsertId();
+        }
+        return 0;
+    }
 }
 ?>
