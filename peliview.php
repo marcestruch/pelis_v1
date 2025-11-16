@@ -10,7 +10,6 @@ require_once __DIR__.'/models/Valoracio.php';
 require_once __DIR__.'/models/ValoracioDAO.php';
 require_once __DIR__.'/models/utils.php';
 session_start();
-
 // Control de sessió d'usuari actiu.
 if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
     $usuariActiu = true;
@@ -22,7 +21,7 @@ if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
 
 // Carrega la pel·lícula pel seu id (GET).
 $peli = null;
-if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["id"])) {
+if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["id"]) || isset($_GET["id"]) && !empty($_GET["id"])) {
     $id = neteja_dades($_GET["id"]);
     $peli = PeliDAO::select($id);
     //Si es un usuario ve su valoracion
@@ -101,7 +100,18 @@ include_once __DIR__ . '/header.php';
                         </div>
                     </div>
                 </div> 
-                <p>Tu valoracion a esta pelicula es <?= $valPropia = $valoracio->getValoracio()?></p>
+                <div class="form">
+                    <form method="get">
+                        <input type="hidden" name="id" value="<?= $_GET['id'] ?? '' ?>">
+                        <input type="radio" name="valoracio" id="1" value="<?= 1?>">
+                        <input type="radio" name="valoracio" id="2" value="<?= 2?>">
+                        <input type="radio" name="valoracio" id="3" value="<?= 3?>">
+                        <input type="radio" name="valoracio" id="4" value="<?= 4?>">
+                        <input type="radio" name="valoracio" id="5" value="<?= 5?>">
+                        <button type="submit">Enviar valoracio</button>
+                    </form>
+                    <p>Tu valoracion a esta pelicula es <?= $valPropia = $valoracio->getValoracio()?></p>
+                </div>
             </div>
         </div>
     <?php endif; ?>
