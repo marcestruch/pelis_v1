@@ -56,6 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["i
             
             $valPropia = $valoracio->getValoracio();
         
+            $valDisabled ="disabled";
+
         }else{
         
             //¡¡si no!!, es usuario pero no ha enviado valoracion
@@ -67,17 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["i
             if(empty($valoracio)){
         
                 $valPropia = "No has valorado aun";
-        
+                $valDisabled ="enabled";
             }else{
         
                 $valPropia = $valoracio->getValoracio();
-        
+                $valDisabled ="disabled";
             }
     
         }
     }
     $valoracioMedia = ValoracioDAO::selectMediaByPeliId($id);
-    $valoracioMedia = round($valoracioMedia, 2);
+    
+    if(!empty($valoracioMedia)){
+        $valoracioMedia = round($valoracioMedia, 2);
+    }
 }
 
 // Si no existeix la pel·lícula, mostra missatge i redirigeix a home.
@@ -162,7 +167,7 @@ include_once __DIR__ . '/header.php';
                         <input type="radio" name="valoracio" id="3" value="<?= 3?>">
                         <input type="radio" name="valoracio" id="4" value="<?= 4?>">
                         <input type="radio" name="valoracio" id="5" value="<?= 5?>">
-                        <button type="submit">Enviar valoracio</button>
+                        <button type="submit" <?= $valDisabled?>>Enviar valoracio</button>
                     </form>
                     <p>Tu valoracion a esta pelicula es <?= $valPropia ?? "" ?></p>
                 </div>
