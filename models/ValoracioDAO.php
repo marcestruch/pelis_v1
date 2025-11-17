@@ -25,6 +25,8 @@ class ValoracioDAO{
         return null;
     }
     
+    
+    
     public static function insertarValoracio($valoracio)
     {
         $conn = DBConnection::connectDB();
@@ -39,7 +41,9 @@ class ValoracioDAO{
         }
         return 0;
     }
-    // Devuelve objeto con la media
+
+    // Devuelve objeto con la media obteniendo el id de la pelicula
+    
     public static function selectMediaByPeliId($peli_id)
     {
         $conn= DBConnection::connectDB();
