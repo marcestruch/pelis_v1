@@ -24,6 +24,11 @@
     </style>
   </head>
   <body>
+<?php
+    $path = $path_prefix ?? "";
+    $in_peliculas = strpos($_SERVER['PHP_SELF'], '/peliculas/') !== false;
+    $in_juegos = strpos($_SERVER['PHP_SELF'], '/juegos/') !== false;
+?>
     <header>
       <div class="collapse bg-dark" id="navbarHeader">
         <div class="container">
@@ -37,12 +42,16 @@
               <ul class="list-unstyled">
                 <?php if(isset($usuariActiu) && $usuariActiu): ?>
                   <!-- Opcions per usuaris autenticats -->
-                  <li><a href="peliedit.php" class="text-white">Afegir nova pel·lícula</a></li>
-                  <li><a href="tancarsessio.php" class="text-white">Tancar sessió</a></li>
+                  <?php if($in_peliculas): ?>
+                      <li><a href="edit.php" class="text-white">Afegir nova pel·lícula</a></li>
+                  <?php elseif($in_juegos): ?>
+                      <li><a href="edit.php" class="text-white">Afegir nou joc</a></li>
+                  <?php endif; ?>
+                  <li><a href="<?= $path ?>tancarsessio.php" class="text-white">Tancar sessió</a></li>
                 <?php else: ?>
                   <!-- Opcions per visiteurs -->
-                  <li><a href="login.php" class="text-white">Accedir</a></li>
-                  <li><a href="registre.php" class="text-white">Registrar-se</a></li>
+                  <li><a href="<?= $path ?>login.php" class="text-white">Accedir</a></li>
+                  <li><a href="<?= $path ?>registre.php" class="text-white">Registrar-se</a></li>
                 <?php endif; ?>
               </ul>
             </div>
@@ -51,14 +60,14 @@
       </div>
       <div class="navbar navbar-dark bg-dark shadow-sm">
         <div class="container">
-          <a href="index.php" class="navbar-brand d-flex align-items-center">
+          <a href="<?= $path ?>index.php" class="navbar-brand d-flex align-items-center">
             <!-- Icona cinema SVG -->
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
               stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               aria-hidden="true" class="me-2" viewBox="0 0 24 24">
               <path d="M7 5V19M17 5V19M3 8H7M17 8H21M3 16H7M17 16H21M3 12H21M6.2 20H17.8C18.9201 20 19.4802 20 19.908 19.782C20.2843 19.5903 20.5903 19.2843 20.782 18.908C21 18.4802 21 17.9201 21 16.8V7.2C21 6.0799 21 5.51984 20.782 5.09202C20.5903 4.71569 20.2843 4.40973 19.908 4.21799C19.4802 4 18.9201 4 17.8 4H6.2C5.07989 4 4.51984 4 4.09202 4.21799C3.71569 4.40973 3.40973 4.71569 3.21799 5.09202C3 5.51984 3 6.07989 3 7.2V16.8C3 17.9201 3 18.4802 3.21799 18.908C3.40973 19.2843 3.71569 19.5903 4.09202 19.782C4.51984 20 5.07989 20 6.2 20Z"></path>
             </svg>
-            <strong>Pelis DWES</strong>
+            <strong>Pelis & Jocs DWES</strong>
           </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
             data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">

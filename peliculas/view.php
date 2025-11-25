@@ -2,68 +2,45 @@
 /**
  * Pàgina per visualitzar una pel·lícula concreta.
  */
-require_once __DIR__.'/models/Peli.php';
-require_once __DIR__.'/models/PeliDAO.php';
-require_once __DIR__.'/models/Usuari.php';
-require_once __DIR__.'/models/UsuariDAO.php';
-require_once __DIR__.'/models/Valoracio.php';
-require_once __DIR__.'/models/ValoracioDAO.php';
-require_once __DIR__.'/models/utils.php';
+require_once __DIR__.'/../models/Peli.php';
+require_once __DIR__.'/../models/PeliDAO.php';
+require_once __DIR__.'/../models/Usuari.php';
+require_once __DIR__.'/../models/UsuariDAO.php';
+require_once __DIR__.'/../models/Valoracio.php';
+require_once __DIR__.'/../models/ValoracioDAO.php';
+require_once __DIR__.'/../models/utils.php';
 
 session_start();
 
 // Control de sessió d'usuari actiu.
-
 if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
-
-    //Usuario logueado
-
     $usuariActiu = true;
-
-    //Le doy nombre el email almacenado en la session o en la cookie a la variable para que lo tenga en cuenta en caso de que haya usuarioActivo
-
     $nom = $_SESSION["usuari"] ?? $_COOKIE['usuari_recordat'];
-
 } else {
-
-    //Usuario no logueado
-
     $usuariActiu = false;
-    
-    //Le doy nombre guest=invitado a la variable para que lo tenga en cuenta en caso de q no haya usuarioActivo
-
     $nom = "Guest";
-
 }
 
 // Carrega la pel·lícula pel seu id (GET).
-
 $peli = null;
 $valoracio = null;
 
 if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["id"])) {
 
     //Limpiar datos y obtener el objeto pelicula con id
-
     $id = neteja_dades($_GET["id"]);
     $peli = PeliDAO::select($id);
     
     if($usuariActiu){
-
         //Si viene de enviar el formulario con la valoracion y es usuario
-        
-        
         if($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["id"]) && isset($_GET["valoracio"])){
         
-        
             //Obtengo la id del usuari
-        
             $usuari_email = $_SESSION['usuari'] ?? $_COOKIE['usuari_recordat'];
             $usuari = UsuariDAO::selectByMail($usuari_email);
             $usuari_id = $usuari->getId();
         
             //Creo una nueva valoracion para insetar el objeto seteado con los atributos correspondientes
-            
             $valoracio = new Valoracio();
             $valoracio -> setId(null);
             $valoracio -> setPeliId($id);
@@ -71,72 +48,48 @@ if ($_SERVER['REQUEST_METHOD'] == "GET" && isset($_GET["id"]) && !empty($_GET["i
             $valoracio ->setValoracio($_GET['valoracio']);
             ValoracioDAO::insertarValoracio($valoracio);
             
-            //Al recibir la informacion obtiene la valoracion
-            //Esta variable acoje tu valoracion en esa pelicula
-            
             $valPropia = $valoracio->getValoracio();
-        
-            //Esta variable deshabilitara el boton de enviar valoracion
-
             $valDisabled ="disabled";
 
         }else{
-        
             //¡¡si no!!, es usuario pero no ha enviado valoracion
-        
             $usuari_email = $_SESSION['usuari'] ?? $_COOKIE['usuari_recordat'];
             $usuari = UsuariDAO::selectByMail($usuari_email);
             $usuari_id = $usuari->getId();
             $valoracio = ValoracioDAO::selectByUserPeliId($usuari_id, $id);        
             if(empty($valoracio)){
-                
-                //Esta variable controla que no has valorado aun evitando un error por null pointer
-
                 $valPropia = "No has valorado aun";
-                
-                //Esta variable habilitara el boton de enviar valoracion
-                
                 $valDisabled ="enabled";
-                
-                //si no
             }else{
-                
-                //Esta variable acoje tu valoracion en esa pelicula
-
                 $valPropia = $valoracio->getValoracio();
-                
-                //Esta variable deshabilitara el boton de enviar valoracion
-                
                 $valDisabled ="disabled";
             }
         }
     }
     
     //Dar valoracion Media a todos 
-
     $valoracioMedia = ValoracioDAO::selectMediaByPeliId($id);
     
     //Si valoracionMedia no esta vacia Redondea el resultado a dos decimales con Round
-
     if(!empty($valoracioMedia)){
         $valoracioMedia = round($valoracioMedia, 2);
     }
 }
 
-// Si no existeix la pel·lícula, mostra missatge i redirigeix a home. Podria ser un else arriba
-
+// Si no existeix la pel·lícula, mostra missatge i redirigeix a home.
 if(empty($peli)){
     $_SESSION["misssatge_error"] = "No s'ha trobat la pel·lícula.";
     header('Location: index.php');
     exit;
 }
 
-include_once __DIR__ . '/header.php';
+$path_prefix = "../";
+include_once __DIR__ . '/../header.php';
 ?>
 <main>
     <?php if(!empty($peli)): ?>
         <div class="bg"
-             style="background-image: url('uploads/<?= htmlspecialchars($peli->getImatge()) ?>');
+             style="background-image: url('../uploads/<?= htmlspecialchars($peli->getImatge()) ?>');
                     background-size: cover;
                     background-position: center;
                     height: 30vh;">
@@ -155,7 +108,7 @@ include_once __DIR__ . '/header.php';
                     <div class="col-md-12">
                         <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
                             <div class="col-md-4 d-none d-lg-block">
-                                <img src="uploads/<?= htmlspecialchars($peli->getImatge()) ?>" class="object-fit-cover" alt="portada_peli" height="450" width="100%">
+                                <img src="../uploads/<?= htmlspecialchars($peli->getImatge()) ?>" class="object-fit-cover" alt="portada_peli" height="450" width="100%">
                             </div>
                             <div class="col p-4 d-flex flex-column position-static">
                                 <strong class="d-inline-block mb-2 text-primary">
@@ -217,4 +170,4 @@ include_once __DIR__ . '/header.php';
         </div>
     <?php endif; ?>
 </main>
-<?php include_once __DIR__ . '/footer.php'; ?>
+<?php include_once __DIR__ . '/../footer.php'; ?>

@@ -2,7 +2,7 @@
 /**
  * Pàgina per eliminar una pel·lícula per id. Només per usuaris registrats.
  */
-require_once __DIR__ . '/models/PeliDAO.php';
+require_once __DIR__ . '/../models/PeliDAO.php';
 session_start();
 
 // Bloqueja l'accés si no eres usuari actiu.

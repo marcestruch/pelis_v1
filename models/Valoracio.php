@@ -3,6 +3,7 @@ class Valoracio{
     //atributos
     private $id;
     private $peli_id;
+    private $joc_id;
     private $usuari_id;
     private $valoracio;
     //constructor
@@ -10,6 +11,7 @@ class Valoracio{
     {
         $this->id=0;
         $this->peli_id=0;
+        $this->joc_id=0;
         $this->usuari_id=0;
         $this->valoracio=0;
     }
@@ -24,6 +26,9 @@ class Valoracio{
     public function getPeliId(){
         return $this->peli_id;
     }
+    public function getJocId(){
+        return $this->joc_id;
+    }
     public function getValoracio(){
         return $this->valoracio;
     }
@@ -36,6 +41,9 @@ class Valoracio{
     }
     public function setPeliId($peli_id){
         $this->peli_id=$peli_id;
+    }
+    public function setJocId($joc_id){
+        $this->joc_id=$joc_id;
     }
     public function setValoracio($valoracio){
         $this->valoracio=$valoracio;

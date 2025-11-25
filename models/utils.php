@@ -1,6 +1,6 @@
 <?php
     function  pujar_imatge($nom_form, $nom_foto){
-        $target_dir = "./uploads/";
+        $target_dir = __DIR__ . "/../uploads/";
         $nom_foto = str_replace(" ", "_",$nom_foto);
 
         $tmp_name = $_FILES[$nom_form]['tmp_name'];

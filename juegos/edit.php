@@ -1,33 +1,32 @@
 <?php
 /**
- * Pàgina per crear i editar pel·lícules.
+ * Pàgina per crear i editar jocs.
  */
-include_once __DIR__.'/models/PeliDAO.php';
-include_once __DIR__.'/models/Peli.php';
-include_once __DIR__.'/models/utils.php';
+include_once __DIR__.'/../models/JocDAO.php';
+include_once __DIR__.'/../models/Joc.php';
+include_once __DIR__.'/../models/utils.php';
 session_start();
 
-// Inicialitza variables de pel·lícula.
+// Inicialitza variables de joc.
 $id = "";
-$imatge_cap = "assets/film.jpg";
-$titol_pagina = "Nova pel·lícula";
+$imatge_cap = "../assets/games.jpg";
+$titol_pagina = "Nou joc";
 $titol = "";
-$director = "";
-$imatge_portada = "assets/proximamente.png";
+$desenvolupador = "";
+$imatge_portada = "../assets/proximamente.png";
 $valoracio = 1;
 $generes = "";
-$llista_generes_peli = [];
+$llista_generes_joc = [];
 $pais = "";
-$duracio = 100;
-$anyo = date("Y");
-$sinopsi = "";
+$any = date("Y");
+$descripcio = "";
 
 $is_insertat = false;
 $is_actualitzat = false;
 
 // Llista de països i gèneres predefinits.
-$llista_paisos_select = ['Espanya', 'Estats Units', 'Itàlia', 'Japó', 'Regne Unit'];
-$llista_generes_select = ['Acció', 'Ciència-ficció', 'Comèdia', 'Drama', 'Fantasia', 'Història', 'Terror'];
+$llista_paisos_select = ['Espanya', 'Estats Units', 'Japó', 'Regne Unit', 'Canadà', 'França'];
+$llista_generes_select = ['Acció', 'Aventura', 'RPG', 'Estratègia', 'Esports', 'Simulació', 'Terror', 'Plataformes'];
 
 // Control de sessió d'usuari actiu.
 if(!empty($_SESSION["usuari"]) || !empty($_COOKIE['usuari_recordat'])){
@@ -44,43 +43,41 @@ if(empty($_SESSION["usuari"])){
     exit;
 }
 
-// Si ve per GET (carrega una pel·lícula existent pel seu id).
+// Si ve per GET (carrega un joc existent pel seu id).
 if ($_SERVER['REQUEST_METHOD'] == "GET") {
     if (isset($_GET["id"]) && !empty($_GET["id"])) {
         $id = neteja_dades($_GET["id"]);
-        $peli = PeliDAO::select($id);
-        if (!$peli) {
-            $_SESSION["misssatge_error"] = "La pel·lícula amb ID $id no existeix.";
+        $joc = JocDAO::select($id);
+        if (!$joc) {
+            $_SESSION["misssatge_error"] = "El joc amb ID $id no existeix.";
             header("Location: index.php");
             exit;
         }
-        // Carrega les dades de la pel·lícula.
-        $imatge_cap = (!empty($peli->getImatge())) ? "uploads/" . $peli->getImatge() : "assets/film.jpg";
-        $titol = $peli->getTitol();
+        // Carrega les dades del joc.
+        $imatge_cap = (!empty($joc->getImatge())) ? "../uploads/" . $joc->getImatge() : "../assets/games.jpg";
+        $titol = $joc->getTitol();
         $titol_pagina = $titol;
-        $imatge_portada = (!empty($peli->getImatge())) ? "uploads/" . $peli->getImatge() : "assets/proximamente.png";
-        $valoracio = $peli->getValoracio();
-        $director = $peli->getDirector();
-        $generes = $peli->getGenere();
-        $llista_generes_peli = explode(",", $generes);
-        $pais = $peli->getPais();
-        $duracio = $peli->getDuracio();
-        $anyo = $peli->getAny();
-        $sinopsi = $peli->getSinopsi();
+        $imatge_portada = (!empty($joc->getImatge())) ? "../uploads/" . $joc->getImatge() : "../assets/proximamente.png";
+        $valoracio = $joc->getValoracio();
+        $desenvolupador = $joc->getDesenvolupador();
+        $generes = $joc->getGenere();
+        $llista_generes_joc = explode(",", $generes);
+        $pais = $joc->getPais();
+        $any = $joc->getAny();
+        $descripcio = $joc->getDescripcio();
     }
 }
 
-// Si ve per POST (inserta o actualitza pel·lícula).
+// Si ve per POST (inserta o actualitza joc).
 if (isset($_POST['formulari'])) {
     $id = neteja_dades($_POST["id"] ?? "");
     $titol = neteja_dades($_POST["titol"] ?? "");
     $valoracio = neteja_dades($_POST["valoracio"] ?? 1);
-    $director = neteja_dades($_POST["director"] ?? "");
+    $desenvolupador = neteja_dades($_POST["desenvolupador"] ?? "");
     $pais = neteja_dades($_POST["pais"] ?? "");
     $generes = neteja_dades(implode(",", $_POST["genere"] ?? []));
-    $duracio = neteja_dades($_POST["duracio"] ?? 100);
-    $anyo = neteja_dades($_POST["any"] ?? date("Y"));
-    $sinopsi = neteja_dades($_POST["sinopsi"] ?? "");
+    $any = neteja_dades($_POST["any"] ?? date("Y"));
+    $descripcio = neteja_dades($_POST["descripcio"] ?? "");
 
     // Gestió de la pujada d'imatge.
     $imatge_nova = "";
@@ -88,58 +85,57 @@ if (isset($_POST['formulari'])) {
         $imatge_nova = pujar_imatge("imatge_portada", $titol);
     }
 
-    // Inserta nova pel·lícula si no hi ha id.
+    // Inserta nou joc si no hi ha id.
     if (empty($id)) {
-        $peli = new Peli();
-        $peli->setTitol($titol);
-        $peli->setDirector($director);
-        $peli->setValoracio($valoracio);
-        $peli->setGenere($generes);
-        $peli->setPais($pais);
-        $peli->setDuracio($duracio);
-        $peli->setAny($anyo);
-        $peli->setSinopsi($sinopsi);
+        $joc = new Joc();
+        $joc->setTitol($titol);
+        $joc->setDesenvolupador($desenvolupador);
+        $joc->setValoracio($valoracio);
+        $joc->setGenere($generes);
+        $joc->setPais($pais);
+        $joc->setAny($any);
+        $joc->setDescripcio($descripcio);
         if (!empty($imatge_nova)) {
-            $peli->setImatge($imatge_nova);
+            $joc->setImatge($imatge_nova);
         }
-        $id = PeliDAO::insert($peli);
-        $peli->setId($id);
+        $id = JocDAO::insert($joc);
+        $joc->setId($id);
         $is_insertat = true;
     }
-    // Si hi ha id, actualitza la pel·lícula existent.
+    // Si hi ha id, actualitza el joc existent.
     else {
-        $peli = PeliDAO::select($id);
-        if (!$peli) {
-            $_SESSION["misssatge_error"] = "No s'ha pogut actualitzar: la pel·lícula no existeix.";
+        $joc = JocDAO::select($id);
+        if (!$joc) {
+            $_SESSION["misssatge_error"] = "No s'ha pogut actualitzar: el joc no existeix.";
             header("Location: index.php");
             exit;
         }
-        $peli->setTitol($titol);
-        $peli->setDirector($director);
-        $peli->setValoracio($valoracio);
-        $peli->setGenere($generes);
-        $peli->setPais($pais);
-        $peli->setDuracio($duracio);
-        $peli->setAny($anyo);
-        $peli->setSinopsi($sinopsi);
+        $joc->setTitol($titol);
+        $joc->setDesenvolupador($desenvolupador);
+        $joc->setValoracio($valoracio);
+        $joc->setGenere($generes);
+        $joc->setPais($pais);
+        $joc->setAny($any);
+        $joc->setDescripcio($descripcio);
         if (!empty($imatge_nova)) {
-            $peli->setImatge($imatge_nova);
+            $joc->setImatge($imatge_nova);
         }
-        PeliDAO::update($peli);
+        JocDAO::update($joc);
         $is_actualitzat = true;
     }
 
-    // Actualitza les imatges a la pàgina segons la pel·lícula última.
-    if (!empty($peli->getImatge())) {
-        $imatge_cap = './uploads/' . $peli->getImatge();
-        $imatge_portada = './uploads/' . $peli->getImatge();
+    // Actualitza les imatges a la pàgina segons el joc últim.
+    if (!empty($joc->getImatge())) {
+        $imatge_cap = '../uploads/' . $joc->getImatge();
+        $imatge_portada = '../uploads/' . $joc->getImatge();
     }
 
-    $llista_generes_peli = explode(",", $peli->getGenere());
+    $llista_generes_joc = explode(",", $joc->getGenere());
     $titol_pagina = $titol;
 }
 
-include_once __DIR__ . '/header.php';
+$path_prefix = "../";
+include_once __DIR__ . '/../header.php';
 ?>
 
 <main>
@@ -152,7 +148,7 @@ include_once __DIR__ . '/header.php';
             <div class="row py-lg-5">
                 <div class="col-lg-6 col-md-8 mx-auto text-white">
                     <h1 class="fw-light"><?= htmlspecialchars($titol_pagina) ?></h1>
-                    <p class="lead"><?= $director ?: "Introdueix les dades de la nova pel·lícula" ?></p>
+                    <p class="lead"><?= $desenvolupador ?: "Introdueix les dades del nou joc" ?></p>
                 </div>
             </div>
         </section>
@@ -160,9 +156,9 @@ include_once __DIR__ . '/header.php';
     <div class="album py-5 bg-light">
         <div class="container">
             <?php if ($is_insertat): ?>
-                <div class="alert alert-success">Pel·lícula creada correctament!</div>
+                <div class="alert alert-success">Joc creat correctament!</div>
             <?php elseif ($is_actualitzat): ?>
-                <div class="alert alert-success">Pel·lícula actualitzada correctament!</div>
+                <div class="alert alert-success">Joc actualitzat correctament!</div>
             <?php endif; ?>
 
             <div class="row g-5">
@@ -176,13 +172,13 @@ include_once __DIR__ . '/header.php';
                     <?php if (!empty($id)): ?>
                         <hr class="my-4">
                         <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                            <i class="bi bi-trash"></i> Eliminar pel·lícula
+                            <i class="bi bi-trash"></i> Eliminar joc
                         </a>
                         <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Eliminar pel·lícula</h5>
+                                        <h5 class="modal-title">Eliminar joc</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <div class="modal-body">
@@ -200,7 +196,7 @@ include_once __DIR__ . '/header.php';
 
                 <!-- COLUMNA ESQUERRA --->
                 <div class="col-md-7 col-lg-8">
-                    <h4 class="mb-3">Dades de la pel·lícula</h4>
+                    <h4 class="mb-3">Dades del joc</h4>
                     <form method="post" enctype="multipart/form-data" action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                         <input type="hidden" name="id" value="<?= htmlspecialchars($id) ?>">
                         <div class="row g-3">
@@ -226,28 +222,24 @@ include_once __DIR__ . '/header.php';
                                 </datalist>
                             </div>
                             <div class="col-6">
-                                <label class="form-label">Director</label>
-                                <input type="text" class="form-control" name="director" value="<?= htmlspecialchars($director) ?>" required>
+                                <label class="form-label">Desenvolupador</label>
+                                <input type="text" class="form-control" name="desenvolupador" value="<?= htmlspecialchars($desenvolupador) ?>" required>
                             </div>
                             <div class="col-6">
                                 <label class="form-label">Gènere</label>
                                 <select class="form-select" name="genere[]" multiple required>
                                     <?php foreach ($llista_generes_select as $genere_select): ?>
-                                        <option value="<?= $genere_select ?>" <?= in_array($genere_select, $llista_generes_peli) ? "selected" : "" ?>><?= $genere_select ?></option>
+                                        <option value="<?= $genere_select ?>" <?= in_array($genere_select, $llista_generes_joc) ? "selected" : "" ?>><?= $genere_select ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="col-3">
-                                <label class="form-label">Duració (min)</label>
-                                <input type="number" class="form-control" name="duracio" value="<?= htmlspecialchars($duracio) ?>" required>
-                            </div>
-                            <div class="col-3">
+                            <div class="col-6">
                                 <label class="form-label">Any</label>
-                                <input type="number" class="form-control" name="any" value="<?= htmlspecialchars($anyo) ?>" required>
+                                <input type="number" class="form-control" name="any" value="<?= htmlspecialchars($any) ?>" required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label">Sinopsi</label>
-                                <textarea class="form-control" name="sinopsi" rows="3" required><?= htmlspecialchars($sinopsi) ?></textarea>
+                                <label class="form-label">Descripció</label>
+                                <textarea class="form-control" name="descripcio" rows="3" required><?= htmlspecialchars($descripcio) ?></textarea>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Imatge portada</label>
@@ -256,7 +248,7 @@ include_once __DIR__ . '/header.php';
                         </div>
                         <hr class="my-4">
                         <button class="btn btn-primary w-100" type="submit" name="formulari" value="formulari">
-                            <i class="bi bi-floppy"></i> Guardar pel·lícula
+                            <i class="bi bi-floppy"></i> Guardar joc
                         </button>
                     </form>
                 </div>
@@ -265,4 +257,4 @@ include_once __DIR__ . '/header.php';
     </div>
 </main>
 
-<?php include_once __DIR__ . '/footer.php'; ?>
+<?php include_once __DIR__ . '/../footer.php'; ?>
